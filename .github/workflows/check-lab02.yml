@@ -11,9 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check required files
+            - name: Check required files
         run: |
-         test -f README.md
+          files=(
             README.md
             openapi.yaml
             campus-spectral.yaml
@@ -61,4 +61,4 @@ jobs:
           bash -n scripts/lint_openapi.sh
           bash -n scripts/mock_openapi.sh
           bash -n scripts/test_mock_with_curl.sh
-          bash -n scripts/collect_session02_evidence.shss
+          bash -n scripts/collect_session02_evidence.sh
