@@ -1,0 +1,147 @@
+﻿openapi: 3.1.0
+
+info:
+  title: IoT Ingestion Contract
+  version: 1.0.0
+  description: Contract between IoT Ingestion and Core Business
+  contact:
+    name: Nguyen Tran Dat
+    email: nguyentrandat17@student.edu
+  license:
+    name: Academic Use
+    identifier: MIT
+servers:
+  - url: https://api.smart-campus.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: System
+    description: System APIs
+
+  - name: Events
+    description: Event APIs
+
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      description: Check service availability
+      operationId: healthCheck
+
+      responses:
+        "200":
+          description: OK
+
+        "400":
+          $ref: "#/components/responses/Problem"
+
+  /events/sensor-reading-created:
+    post:
+      tags:
+        - Events
+      summary: Publish sensor reading
+      description: Publish sensor reading event
+      operationId: publishSensorReading
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SensorReadingEvent"
+
+      responses:
+        "202":
+          description: Accepted
+
+        "400":
+          $ref: "#/components/responses/Problem"
+
+  /events/sensor-threshold-exceeded:
+    post:
+      tags:
+        - Events
+      summary: Publish threshold exceeded
+      description: Publish threshold exceeded event
+      operationId: publishThresholdExceeded
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ThresholdExceeded"
+
+      responses:
+        "202":
+          description: Accepted
+
+        "400":
+          $ref: "#/components/responses/Problem"
+
+  /events/latest:
+    get:
+      tags:
+        - Events
+      summary: Get latest event
+      description: Return latest event
+      operationId: getLatestEvent
+
+      responses:
+        "200":
+          description: Latest event
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventUnion"
+
+        "400":
+          $ref: "#/components/responses/Problem"
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+
+    SensorReadingEvent:
+      type: object
+      properties:
+        deviceId:
+          type: string
+
+    ThresholdExceeded:
+      type: object
+      properties:
+        value:
+          type: number
+
+    EventUnion:
+      oneOf:
+        - $ref: "#/components/schemas/SensorReadingEvent"
+        - $ref: "#/components/schemas/ThresholdExceeded"
+
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+
+  responses:
+
+    Problem:
+      description: Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
